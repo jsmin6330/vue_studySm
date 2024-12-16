@@ -1,13 +1,34 @@
 <template>
     <div class="search-box">
-        <input />
-        <input type="date" />
-        <input type="date" />
-        <button>검색</button>
+        <input v-model.lazy="keyword"/> 
+        <input type="date" v-model="searchStartDate"/>
+        <input type="date" v-model="searchEndDate"/>
+        <button @click = "handlerSearch">검색</button>
         <button>신규등록</button>
     </div>
 </template>
-<script></script>
+<script setup>
+import { watchEffect } from 'vue';
+import router from '../../../../router';
+const keyword = ref('keyword');
+const searchStartDate = ref('');
+const searchEndDate = ref('');
+
+
+const handlerSearch = () => {
+    const query = [];
+    !keyword.value || query.push(`searchTitle=${keyword.value}`);
+    !searchStartDate.value || query.push(`searchStartDate=${searchStartDate.value}`);
+    !searchEndDate.value || query.push(`searchEndDate=${searchEndDate.value}`);
+    const queryString = query.length > 0 ? `?${query.join('&')}` : '';
+
+    router.push(queryString);
+};
+
+watchEffect(() => window.location.search && 
+router.push(window.location.pathname, {replace : true}));
+
+</script>
 
 <style lang="scss" scoped>
 .search-box {
