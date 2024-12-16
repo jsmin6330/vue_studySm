@@ -1,8 +1,8 @@
 <template>
     <div class="search-box">
         <input v-model.lazy="keyword"/> 
-        <input type="date" v-model="searchStartDate"/>
-        <input type="date" v-model="searchEndDate"/>
+        <input type="date" v-model="searchStDate"/>
+        <input type="date" v-model="searchEdDate"/>
         <button @click = "handlerSearch">검색</button>
         <button>신규등록</button>
     </div>
@@ -10,16 +10,16 @@
 <script setup>
 import { watchEffect } from 'vue';
 import router from '../../../../router';
-const keyword = ref('keyword');
-const searchStartDate = ref('');
-const searchEndDate = ref('');
+const keyword = ref('');
+const searchStDate = ref('');
+const searchEdDate = ref('');
 
 
 const handlerSearch = () => {
     const query = [];
     !keyword.value || query.push(`searchTitle=${keyword.value}`);
-    !searchStartDate.value || query.push(`searchStartDate=${searchStartDate.value}`);
-    !searchEndDate.value || query.push(`searchEndDate=${searchEndDate.value}`);
+    !searchStDate.value || query.push(`searchStDate=${searchStDate.value}`);
+    !searchEdDate.value || query.push(`searchEdDate=${searchEdDate.value}`);
     const queryString = query.length > 0 ? `?${query.join('&')}` : '';
 
     router.push(queryString);
