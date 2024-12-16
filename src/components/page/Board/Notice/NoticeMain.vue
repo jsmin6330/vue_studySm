@@ -55,8 +55,6 @@ const route = useRoute();
 const noticeList = ref();
 const cPage = ref(1);
 
-// watch(route, () => console.log(route.query));
-
 const searchList = () =>{
     const param = new URLSearchParams({
         searchTitle: route.query.searchTitle || '', 
@@ -71,7 +69,7 @@ const searchList = () =>{
     });
 };
 
-watch(route, () => searchList);
+watch(route, () => searchList());
 
 onMounted(() => {
     searchList();
