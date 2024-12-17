@@ -4,16 +4,18 @@
         <input type="date" v-model="searchStDate"/>
         <input type="date" v-model="searchEdDate"/>
         <button @click = "handlerSearch">검색</button>
-        <button>신규등록</button>
+        <button @click = "handlerModal">신규등록</button>
     </div>
 </template>
 <script setup>
 import { watchEffect } from 'vue';
 import router from '../../../../router';
+import { useModalStore } from '../../../../stores/modalState';
+
 const keyword = ref('');
 const searchStDate = ref('');
 const searchEdDate = ref('');
-
+const modalState = useModalStore();
 
 const handlerSearch = () => {
     const query = [];
@@ -24,6 +26,10 @@ const handlerSearch = () => {
 
     router.push(queryString);
 };
+
+const handlerModal = () => {
+    modalState.setModalState();
+}
 
 watchEffect(() => window.location.search && 
 router.push(window.location.pathname, {replace : true}));

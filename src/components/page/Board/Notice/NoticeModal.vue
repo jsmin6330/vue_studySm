@@ -2,10 +2,10 @@
     <teleport to="body">
         <div class="backdrop">
             <div class="container">
-                <label> 제목 :<input type="text" /> </label>
+                <label> 제목 :<input type="text" v-model="noticeDetail.title"/> </label>
                 <label>
                     내용 :
-                    <input type="text" />
+                    <input type="text" v-model="noticeDetail.content"/>
                 </label>
                 파일 :<input type="file" style="display: none" id="fileInput" />
                 <label class="img-label" htmlFor="fileInput"> 파일 첨부하기 </label>
@@ -13,15 +13,91 @@
                     <label>파일명</label>
                 </div>
                 <div class="button-box">
-                    <button>삭제</button>
-                    <button>나가기</button>
+                    <button @click="props.idx ? handlerUpdateBtn() : hadlerSaveBtn()">{{ props.idx? '수정' : '저장' }}</button>
+                    <button v-if="props.idx" @click="handlerDeleteBtn">삭제</button>
+                    <button @click="handlerModal">나가기</button>
                 </div>
             </div>
         </div>
     </teleport>
 </template>
 
-<script setup></script>
+<script setup>
+import axios from 'axios';
+import { useModalStore } from '../../../../stores/modalState';
+import { useUserInfo } from '../../../../stores/userInfo';
+import { onMounted, onUnmounted } from 'vue';
+
+const emit = defineEmits(['postSuccess','modalClose']);
+const props = defineProps(['idx']);
+
+const modalState = useModalStore();
+const userInfo = useUserInfo();
+const noticeDetail = ref({});
+
+const handlerModal = (idx) => {
+    // console.log(idx);
+    modalState.setModalState();
+}
+
+const hadlerSaveBtn = () => {
+    const textData = {
+        ...noticeDetail.value,
+        loginId: userInfo.user.loginId,
+        context: noticeDetail.value.content
+    };
+    axios.post('/api/board/noticeSaveBody.do',textData).then((res) => {
+        if(res.data.result === 'success'){
+            modalState.setModalState();
+            emit('postSuccess');
+        }
+    })
+};
+
+const searchDetail = () => {
+    axios.post("/api/board/noticeDetailBody.do", { noticeSeq: props.idx })
+    .then((res) => {
+        noticeDetail.value = res.data.detail;
+    });
+}
+
+const handlerUpdateBtn = () => {
+    const textData = {
+        title: noticeDetail.value.title, 
+        context: noticeDetail.value.content, 
+        noticeSeq: props.idx,
+    }
+    axios.post('/api/board/noticeUpdateBody.do',textData)
+    .then((res) => {
+        if(res.data.result === 'success'){
+            modalState.setModalState();
+            emit('postSuccess');
+        }
+    });
+};
+
+const handlerDeleteBtn = () => {
+    axios.post('/api/board/noticeDeleteBody.do', { noticeSeq: props.idx })
+    .then((res) => {
+        if(res.data.result === 'success'){
+            modalState.setModalState();
+            emit('postSuccess');
+        }
+    })
+}
+
+onMounted(() => {
+    console.log(props.idx);
+    props.idx && searchDetail(); 
+    //부모에게서 idx 값이 전달된게 있을 때만 searchDetail()을 실행
+});
+
+onUnmounted(() => {
+    emit('modalClose');
+});
+
+
+</script>
 
 <style lang="scss" scoped>
 .backdrop {

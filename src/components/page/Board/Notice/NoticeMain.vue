@@ -1,5 +1,7 @@
 <template>
     <div class="divNoticeList">
+        <NoticeModal v-if="modalState.modalState" @postSuccess ="searchList" 
+        @modalClose="() => (noticeIdx = 0)" :idx="noticeIdx"/>
         현재 페이지: {{ cPage }} 총 개수: {{ noticeList?.noticeCnt }}
         <table>
             <colgroup>
@@ -20,7 +22,8 @@
             <tbody>
                 <template v-if="noticeList">
                     <template v-if="noticeList.noticeCnt > 0">
-                        <tr v-for="notice in noticeList.notice" :key="notice.noticeIdx">
+                        <tr v-for="notice in noticeList.notice" :key="notice.noticeIdx"
+                        @click = handlerModal(notice.noticeIdx)>
                             <td>{{ notice.noticeIdx }}</td>
                             <td>{{ notice.title }}</td>
                             <td>{{ notice.createdDate.substr(0,10) }}</td>
@@ -50,10 +53,13 @@
 import axios from 'axios';
 import { useRoute } from 'vue-router';
 import Pagination from '../../../common/Pagination.vue';
+import { useModalStore } from '../../../../stores/modalState';
 
 const route = useRoute();
 const noticeList = ref();
 const cPage = ref(1);
+const modalState = useModalStore();
+const noticeIdx = ref(0);
 
 const searchList = () =>{
     const param = new URLSearchParams({
@@ -67,6 +73,11 @@ const searchList = () =>{
     .then((res) => {
         noticeList.value = res.data;
     });
+};
+
+const handlerModal = (idx) => {
+    noticeIdx.value = idx;
+    modalState.setModalState();
 };
 
 watch(route, () => searchList());
