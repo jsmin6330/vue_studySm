@@ -1,7 +1,5 @@
 <template>
     <div class="divNoticeList">
-        <NoticeModal v-if="modalState.modalState" @postSuccess ="searchList" 
-        @modalClose="() => (noticeIdx = 0)" :idx="noticeIdx"/>
         현재 페이지: {{ cPage }} 총 개수: {{ noticeList?.noticeCnt }}
         <table>
             <colgroup>
@@ -53,49 +51,15 @@
 </template>
 
 <script setup>
-import axios from 'axios';
-import { useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 import Pagination from '../../../common/Pagination.vue';
-import { useModalStore } from '../../../../stores/modalState';
-import { useQuery } from '@tanstack/vue-query';
+import {useNoticeListSearchQuery} from '../../../../hook/notice/useNoticeListSearchQuery';
 
-const route = useRoute();
 const router = useRouter();
-// const noticeList = ref();
 const cPage = ref(1);
-const modalState = useModalStore();
-const noticeIdx = ref(0);
 const injectedValue = inject('provideValue');
 
-// watch(injectedValue, () => {
-//     console.log(injectedValue.value);
-// })
-
-const searchList = async () =>{
-    const param = new URLSearchParams({
-        ...injectedValue.value,
-        // searchTitle: injectedValue.searchTitle || '', 
-        // searchStDate: injectedValue.searchStDate || '',
-        // searchEdDate: injectedValue.searchEdDate || '',
-        currentPage: cPage.value,
-        pageSize: 5,
-    })
-    const result = await axios.post('/api/board/noticeListJson.do', param);
-    return result.data;
-};
-
-const {
-    data: noticeList, 
-    isLoading, 
-    isSuccess,
-    isLoadingError,
-    isError,
-    refetch
-    } = useQuery({
-    queryKey: ['noticeList', injectedValue, cPage],
-    queryFn: searchList,
-    staleTime: 1000*60, //1분동안 캐싱(tanstack쿼리의 장점)
-})
+const {data: noticeList, isLoading, refetch, isSuccess} = useNoticeListSearchQuery(injectedValue, cPage);
 
 const handlerDetail = (param) => {
     router.push({
@@ -103,20 +67,6 @@ const handlerDetail = (param) => {
         params: { idx: param },
     });
 }
-
-
-// const handlerModal = (idx) => {
-//     noticeIdx.value = idx;
-//     modalState.setModalState();
-// };
-
-// watch([injectedValue, cPage], refetch);
-
-// watch(route, () => searchList());
-
-// onMounted(() => {
-//     searchList();
-// })
 
 </script>
 
