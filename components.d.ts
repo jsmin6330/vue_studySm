@@ -12,6 +12,7 @@ declare module 'vue' {
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     LeftManuBar: typeof import('./src/components/layout/LeftManuBar.vue')['default']
     LoginMain: typeof import('./src/components/page/Login/LoginMain.vue')['default']
+    NoticeDetail: typeof import('./src/components/page/Board/Notice/NoticeDetail.vue')['default']
     NoticeMain: typeof import('./src/components/page/Board/Notice/NoticeMain.vue')['default']
     NoticeMain_v1: typeof import('./src/components/page/Board/Notice/NoticeMain_v1.vue')['default']
     NoticeMainV1: typeof import('./src/components/page/Board/Notice/NoticeMainV1.vue')['default']
